@@ -1,5 +1,5 @@
 /* @theme edulution-dark
-   @version 0.1.5
+   @version 0.1.6
 */
 
 :root {
@@ -77,18 +77,6 @@
     --dark-overlay-transparent: #1e293850;
     --dark-overlay-foreground: #ffffff;
     --dark-muted-dialog: #1e293b;
-}
-
-md-fab-speed-dial {
-    md-fab-actions {
-        button.md-button.md-fab[ng-click="mailbox.newMessage($event, true)"] {
-            width: 0px;
-            height: 0px;
-            display: none;
-            opacity: 0;
-            
-        }
-    }
 }
 
 md-dialog[ui-view=maileditor] {
@@ -11849,4 +11837,33 @@ md-sidenav {
             color: var(--edulution-blue) !important;
         }
     }
+}
+
+@supports (-webkit-touch-callout: none) {
+
+    md-fab-speed-dial .md-fab-action-item,
+    md-fab-speed-dial .md-fab-action-item>button {
+        will-change: transform, opacity;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+
+    md-fab-speed-dial.md-is-open .md-fab-action-item {
+        opacity: 1 !important;
+        -webkit-transform: scale(1) translateZ(0) !important;
+        transform: scale(1) translateZ(0) !important;
+    }
+
+    md-fab-speed-dial.md-is-open .md-fab-action-item>button {
+        pointer-events: auto !important;
+    }
+}
+
+md-fab-actions button[ng-click="mailbox.newMessage($event, true)"] {
+    pointer-events: none !important;
+    width: 0px !important;
+    height: 0px !important;
+    opacity: 0 !important;
 }
