@@ -1,5 +1,5 @@
 /* @theme edulution-dark
-   @version 0.1.7
+   @version 0.1.8
 */
 
 :root {
@@ -11868,6 +11868,11 @@ md-fab-actions button[ng-click="mailbox.newMessage($event, true)"] {
     opacity: 0 !important;
 }
 
-a.sg-icon-button[target="_blank"][href^="/SOGo/so/"] {
-  display: none;
+a.sg-icon-button[target="_blank"][href*="/SOGo/so/"],
+a.sg-icon-button[target="_blank"][ng-href*="/SOGo/so/"] {
+  display: none !important;
+}
+
+md-chips {
+    overflow: scroll !important;
 }
