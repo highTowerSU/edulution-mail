@@ -1,5 +1,5 @@
 /* @theme edulution-dark
-   @version 0.1.8
+   @version 0.1.9
 */
 
 :root {
@@ -11875,4 +11875,11 @@ a.sg-icon-button[target="_blank"][ng-href*="/SOGo/so/"] {
 
 md-chips {
     overflow: scroll !important;
+}
+
+@media (max-width: 767px) {
+  .md-button.md-ink-ripple {
+    overflow-x: auto;
+    max-width: 100vw;
+  }
 }
