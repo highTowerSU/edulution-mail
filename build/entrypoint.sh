@@ -577,14 +577,14 @@ ensure_sogo_files() {
   elif [[ "$current_theme" =~ edulution-dark ]]; then
     chosen_src="$dark_src";  chosen_label="dark"
   else
-    # No file or no tag: default to dark (policy), but log it
-    log_warning "No recognizable @theme in installed CSS; defaulting to dark"
-    chosen_src="$dark_src";  chosen_label="dark"
+    # No file or no tag: default to light (policy), but log it
+    log_warning "No recognizable @theme in installed CSS; defaulting to light"
+    chosen_src="$light_src"; chosen_label="light"
   fi
 
   if [ ! -f "$chosen_src" ]; then
-    log_warning "Chosen theme source ($chosen_label) missing; falling back to dark source"
-    chosen_src="$dark_src"; chosen_label="dark"
+    log_warning "Chosen theme source ($chosen_label) missing; falling back to light source"
+    chosen_src="$light_src"; chosen_label="light"
   fi
 
   # Try to update the matching theme **only if the same theme** and src version is greater
@@ -592,8 +592,8 @@ ensure_sogo_files() {
 
   # First install on empty systems (no target file at all)
   if [ ! -f "$target_css" ]; then
-    log_info "No custom-theme.css present; installing default dark"
-    cp -f "$dark_src" "$target_css"
+    log_info "No custom-theme.css present; installing default light"
+    cp -f "$light_src" "$target_css"
     debug_css_header "$target_css"
   fi
 
