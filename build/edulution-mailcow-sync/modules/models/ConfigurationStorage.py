@@ -39,6 +39,8 @@ class ConfigurationStorage:
         self.IGNORE_MAILBOXES = os.environ.get("IGNORE_MAILBOXES", "")
         self.IGNORE_MAILBOXES = self.IGNORE_MAILBOXES.split(",") if "," in self.IGNORE_MAILBOXES else [ self.IGNORE_MAILBOXES ]
 
+        self.GROUP_DISPLAY_NAME = os.environ.get("GROUP_DISPLAY_NAME", "description")
+
         if not self.KEYCLOAK_SECRET_KEY:
             logging.error("!!! ERROR !!!")
             logging.error("Environment variables for mailcow or keycloak are not set! Please refere the documentation!")
@@ -59,6 +61,7 @@ class ConfigurationStorage:
         - SOFT_DELETE_MARK_COUNT
         - PERMANENT_DELETE_ENABLED
         - IGNORE_MAILBOXES
+        - GROUP_DISPLAY_NAME
         """
 
         OVERRIDE_FILE = os.environ.get("MAILCOW_PATH", "/srv/docker/edulution-mail") + "/mail.override.config"
@@ -121,6 +124,10 @@ class ConfigurationStorage:
                 new_ignore_mailboxes = new_ignore_mailboxes.split(",") if "," in new_ignore_mailboxes else [ new_ignore_mailboxes ]
                 logging.info(f"* OVERRIDE IGNORE_MAILBOXES: {self.IGNORE_MAILBOXES} with {new_ignore_mailboxes}")
                 self.IGNORE_MAILBOXES = new_ignore_mailboxes
+
+            if "GROUP_DISPLAY_NAME" in override_config:
+                logging.info(f"* OVERRIDE GROUP_DISPLAY_NAME: {self.GROUP_DISPLAY_NAME} with {override_config['GROUP_DISPLAY_NAME']}")
+                self.GROUP_DISPLAY_NAME = override_config["GROUP_DISPLAY_NAME"]
 
             logging.info("==========================================================")
             

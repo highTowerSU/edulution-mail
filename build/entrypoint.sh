@@ -174,11 +174,14 @@ SELECT
     a.domain                          AS domain,
     a.address                         AS c_name,
     ''                                AS c_password,
-    CONCAT(
-        a.address,
-        ' (Verteiler, ',
-        LENGTH(a.goto) - LENGTH(REPLACE(a.goto, ',', '')) + 1,
-        ' Empfaenger)'
+    COALESCE(
+        NULLIF(a.public_comment, ''),
+        CONCAT(
+            a.address,
+            ' (Verteiler, ',
+            LENGTH(a.goto) - LENGTH(REPLACE(a.goto, ',', '')) + 1,
+            ' Empfaenger)'
+        )
     )                                 AS c_cn,
     NULL                              AS c_l,
     NULL                              AS c_o,

@@ -133,6 +133,11 @@ class EdulutionMailcowSync:
             mail = group["attributes"]["mail"][0]
             maildomain = mail.split("@")[-1]
 
+            # Extract group description for display name (if configured)
+            group_description = ""
+            if self._config.GROUP_DISPLAY_NAME == "description":
+                group_description = group.get("description", "")
+
             membermails = []
             for member in group["members"]:
                 if "id" not in member:
@@ -154,12 +159,12 @@ class EdulutionMailcowSync:
                 if self._config.SOFT_DELETE_ENABLED and mail in aliasList._all:
                     logging.warning(f"    -> Mailinglist {mail} has no members from Keycloak, but exists in Mailcow - processing with soft-delete")
                     # Process with empty member list to trigger soft-delete tracking
-                    self._addAlias(mail, membermails, aliasList, sogo_visible = 0, track_member_changes = True)
+                    self._addAlias(mail, membermails, aliasList, sogo_visible = 0, track_member_changes = True, public_comment = group_description)
                 else:
                     logging.debug(f"    -> Mailinglist {mail} has no members, skipping!")
                     continue
             else:
-                self._addAlias(mail, membermails, aliasList, sogo_visible = 0, track_member_changes = True)
+                self._addAlias(mail, membermails, aliasList, sogo_visible = 0, track_member_changes = True, public_comment = group_description)
 
             self._addAliasesFromProxyAddresses(group, mail, aliasList)
 
@@ -463,7 +468,7 @@ class EdulutionMailcowSync:
 
         return True
 
-    def _addAlias(self, alias: str, goto: str | list, aliasList: AliasListStorage, sogo_visible: int = 1, track_member_changes: bool = False) -> bool:
+    def _addAlias(self, alias: str, goto: str | list, aliasList: AliasListStorage, sogo_visible: int = 1, track_member_changes: bool = False, public_comment: str = "") -> bool:
         # Convert goto to list if needed
         new_members = goto if isinstance(goto, list) else [goto]
 
@@ -489,13 +494,16 @@ class EdulutionMailcowSync:
             # No tracking, use goto as-is
             goto_targets = ",".join(new_members) if isinstance(new_members, list) else goto
 
-        return aliasList.addElement({
+        element = {
             "address": alias,
             "goto": goto_targets,
             "active": 1,
             "sogo_visible": sogo_visible,
             "private_comment": MANAGED_MARKER_ALIAS
-        }, alias)
+        }
+        if public_comment:
+            element["public_comment"] = public_comment
+        return aliasList.addElement(element, alias)
 
     # def _addListFilter(self, listAddress: str, memberAddresses: list, filterList: FilterListStorage):
     #     scriptData = "### Auto-generated mailinglist filter by linuxmuster ###\r\n\r\n"
