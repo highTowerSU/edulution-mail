@@ -288,6 +288,26 @@ configure_sogo_gal() {
         else
             log_info "LDAP GAL already configured with CNFieldName='$GROUP_CN_FIELD'"
         fi
+
+        # Ensure SOGoLDAPGroupExpansionEnabled is set (may be missing on older installations)
+        if ! grep -q "SOGoLDAPGroupExpansionEnabled" "$SOGO_CONF" 2>/dev/null; then
+            log_warning "SOGoLDAPGroupExpansionEnabled missing - adding it now"
+            cp "$SOGO_CONF" "${SOGO_CONF}.bak.groupexp.$(date +%Y%m%d%H%M%S)"
+
+            # Add SOGoLDAPGroupExpansionEnabled after the closing of SOGoUserSources
+            sed -i '/^  );$/a\
+\
+  SOGoLDAPGroupExpansionEnabled = YES;' "$SOGO_CONF"
+
+            log_success "Added SOGoLDAPGroupExpansionEnabled = YES"
+
+            # Restart SOGo to apply changes
+            if docker ps --format "{{.Names}}" | grep -q "sogo-mailcow"; then
+                log_info "Restarting SOGo to apply configuration changes"
+                docker restart mailcowdockerized-sogo-mailcow-1 2>/dev/null || true
+            fi
+        fi
+
         return 0
     fi
 

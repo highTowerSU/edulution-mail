@@ -152,6 +152,12 @@ class DeactivationTracker:
         Returns:
             List of members that should actually be in the alias (including members still in grace period)
         """
+        # Ensure alias_members key exists (backward compatibility)
+        if "alias_members" not in self.data:
+            self.data["alias_members"] = {}
+            logging.info(f"  * Initialized missing 'alias_members' key in tracker")
+            self.save()
+
         current_set = set(current_members) if current_members else set()
         new_set = set(new_members) if new_members else set()
 
