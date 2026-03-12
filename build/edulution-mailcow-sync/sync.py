@@ -129,6 +129,7 @@ class EdulutionMailcowSync:
                 self._addMailbox(user, mailboxList)
                 self._addAliasesFromProxyAddresses(user, mail, aliasList)
         
+        _debug_group_logged = False
         for group in groups:
             mail = group["attributes"]["mail"][0]
             maildomain = mail.split("@")[-1]
@@ -136,7 +137,23 @@ class EdulutionMailcowSync:
             # Extract group description for display name (if configured)
             group_description = ""
             if self._config.GROUP_DISPLAY_NAME == "description":
-                group_description = group.get("description", "")
+                # Debug: log first group's structure to verify where description lives
+                if not _debug_group_logged:
+                    _top_keys = [k for k in group.keys() if k not in ("members",)]
+                    logging.info(f"  [DEBUG GROUP_DISPLAY_NAME] First group top-level keys: {_top_keys}")
+                    logging.info(f"  [DEBUG GROUP_DISPLAY_NAME] group.get('description'): {repr(group.get('description', ''))}")
+                    if "attributes" in group:
+                        logging.info(f"  [DEBUG GROUP_DISPLAY_NAME] group['attributes'] keys: {list(group['attributes'].keys())}")
+                        if "description" in group["attributes"]:
+                            logging.info(f"  [DEBUG GROUP_DISPLAY_NAME] group['attributes']['description']: {repr(group['attributes']['description'])}")
+                    _debug_group_logged = True
+
+                # Try top-level field first (Keycloak 23+), then attributes (older versions)
+                desc = group.get("description", "")
+                if not desc and "attributes" in group and "description" in group["attributes"]:
+                    desc_attr = group["attributes"]["description"]
+                    desc = desc_attr[0] if isinstance(desc_attr, list) and desc_attr else str(desc_attr) if desc_attr else ""
+                group_description = desc
 
             membermails = []
             for member in group["members"]:
